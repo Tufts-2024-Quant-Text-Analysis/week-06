@@ -31,7 +31,7 @@ def get_dramatist(urn: str):
     if "tlg0085" in urn: return "Aeschylus"
 
 
-def iter_lines(urn, tree):
+def iter_lines(title, urn, tree):
     rows = []
 
     for l in tree.iterfind(".//tei:l", namespaces=NAMESPACES):
@@ -48,6 +48,7 @@ def iter_lines(urn, tree):
                         "n": n[0],
                         "urn": urn,
                         "dramatist": get_dramatist(urn),
+                        "title": title,
                         "speaker": speaker,
                         "text": l.text.strip(),
                     }
@@ -60,7 +61,8 @@ data = []
 
 for f, urn in FILES:
     tree = etree.parse(f)
-    lines = iter_lines(urn, tree)
+    title = tree.xpath("//tei:titleStmt/tei:title/text()", namespaces=NAMESPACES)[0]
+    lines = iter_lines(title, urn, tree)
     data += lines
 
 df = pd.DataFrame(data)
